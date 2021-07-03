@@ -1,5 +1,9 @@
 /**
  * function to convert celcius to farenheit
- */ 
-const convertCtoF = t => ( (t * 9/5) + 32 );
-const convertFtoC = t => ( (t - 32) * 5/9 );
+ */
+function convertCtoF (t) {
+  if(t==null) {
+    return null;
+  }
+  return (t * 9/5) + 32;
+}
