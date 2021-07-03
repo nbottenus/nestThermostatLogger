@@ -9,7 +9,6 @@ function onOpen() {
     .addItem('Smart Device Tool', 'showSidebar')
     .addSeparator()
     .addItem('Log thermostat data','logThermostatDataAllDevices')
-    .addItem('Set temperature','setTemperature')
     .addToUi();
   
 }
@@ -154,39 +153,45 @@ function logThermostatDataAllDevices() {
         const fan = device['traits']['sdm.devices.traits.Fan']['timerMode'];
         const mode = device['traits']['sdm.devices.traits.ThermostatMode']['mode'];
         const thermostatEcoMode = device['traits']['sdm.devices.traits.ThermostatEco']['mode'];
-        const thermostatEcoHeatCelcius = device['traits']['sdm.devices.traits.ThermostatEco']['heatCelsius'];
-        const thermostatEcoHeatFarenheit = convertCtoF(thermostatEcoHeatCelcius);
-        const thermostatEcoCoolCelcius = device['traits']['sdm.devices.traits.ThermostatEco']['coolCelsius'];
-        const thermostatEcoCoolFarenheit = convertCtoF(thermostatEcoCoolCelcius);
+        //const thermostatEcoHeatCelcius = device['traits']['sdm.devices.traits.ThermostatEco']['heatCelsius'];
+        //const thermostatEcoHeatFarenheit = convertCtoF(thermostatEcoHeatCelcius);
+        //const thermostatEcoCoolCelcius = device['traits']['sdm.devices.traits.ThermostatEco']['coolCelsius'];
+        //const thermostatEcoCoolFarenheit = convertCtoF(thermostatEcoCoolCelcius);
         const thermostatHvac = device['traits']['sdm.devices.traits.ThermostatHvac']['status'];
         const tempCelcius = device['traits']['sdm.devices.traits.Temperature']['ambientTemperatureCelsius'];
         const tempFarenheit = convertCtoF(tempCelcius);
-
-        if (name === 'enterprises/' + PROJECT_ID + '/devices/' + DOWNSTAIRS_THERMOSTAT) {
-          location = 'Downstairs';
+        const thermostatSetPoint = device['traits']['sdm.devices.traits.ThermostatTemperatureSetpoint'];
+        thermostatSetPointC = null;
+        thermostatSetPointF = null;
+        if (mode == "COOL") {
+          thermostatSetPointC = thermostatSetPoint['coolCelsius'];
         }
-        else {
-          location = 'Upstairs';
+        else if (mode == "HEAT") {
+          thermostatSetPointC = thermostatSetPoint['heatCelsius'];
         }
+        else {// May need to handle heat/cool here....
+        }
+        thermostatSetPointF = convertCtoF(thermostatSetPointC);
 
         dataArray.push(
           [
             d,
             name,
             type,
-            location,
-            humidity,
             connectivity,
             fan,
             mode,
             thermostatEcoMode,
-            thermostatEcoHeatCelcius,
-            thermostatEcoHeatFarenheit,
-            thermostatEcoCoolCelcius,
-            thermostatEcoCoolFarenheit,
+            //thermostatEcoHeatCelcius,
+            //thermostatEcoHeatFarenheit,
+            //thermostatEcoCoolCelcius,
+            //thermostatEcoCoolFarenheit,
             thermostatHvac,
+            thermostatSetPointC,
+            thermostatSetPointF,
             tempCelcius,
-            tempFarenheit
+            tempFarenheit,
+            humidity,
           ].concat(weatherDataArray)
         );
         
@@ -264,61 +269,4 @@ function retrieveWeather(stationCode) {
   
   return weatherArray;
 
-}
-
-/**
- * function to change temperature to value in the Google Sheet
- */
-function setTemperature() {
-  
-  // get temperature from Sheet
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const tempSheet = ss.getSheetByName('sheetNest');
-  const tempF = tempSheet.getRange('A1').getValue(); // Change this cell reference to match the temperature input cell of your Google Sheet 
-  const tempC = convertFtoC(tempF);
-
-  console.log(tempC.toFixed(1));
-  console.log(typeof tempC)
-
-  
-  // get the smart service
-  const smartService = getSmartService();
-  
-  // get the access token
-  const access_token = smartService.getAccessToken();
-  console.log(access_token);
-
-  // setup the SMD API url
-  const url = 'https://smartdevicemanagement.googleapis.com/v1';
-
-  // set the endpoint
-  const endpoint = '/enterprises/'  + PROJECT_ID + '/devices/' + DOWNSTAIRS_THERMOSTAT + ':executeCommand';
-
-  // setup the headers for the call
-  const headers = {
-    'Authorization': 'Bearer ' + access_token,
-    'Content-Type': 'application/json'
-  }
-
-  const data = {
-    'command': 'sdm.devices.commands.ThermostatTemperatureSetpoint.SetHeat',
-    'params': {
-      'heatCelsius': tempC
-    }
-  }
-  
-  const options = {
-    'headers': headers,
-    'method': 'post',
-    'payload': JSON.stringify(data)
-  }
-  
-  try {
-    // try calling API
-    const response = UrlFetchApp.fetch(url + endpoint, options);
-
-  }
-  catch(e) {
-    console.log('Error: ' + e);
-  }
 }
