@@ -27,3 +27,7 @@ And yes, it's possible to set your thermostat temperature from your Google Sheet
 # More Info
 
 Tutorial: [Control Your Nest Thermostat And Build A Temperature Logger In Google Sheets Using Apps Script](https://www.benlcollins.com/apps-script/nest-thermostat/)
+
+I followed the above tutorial with the clarification:
+
+* At step 15, run the function showSidebar() from oauth2.gs, and find the sidebar back in the google sheet. This provides the necessary authentication link to make the rest of the API calls work.
