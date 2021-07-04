@@ -91,7 +91,8 @@ function makeRequest(endpoint) {
 function logThermostatDataAllDevices() {
 
   // get the latest weather data
-  const weatherDataArray = retrieveWeather('KMRB');
+  //const weatherDataArray = retrieveWeather('KMRB');
+  const weatherDataArray = retrieveWeather_v2('90210');
   console.log(weatherDataArray);
   
   // get the smart service
@@ -260,6 +261,50 @@ function retrieveWeather(stationCode) {
       visibility,
       relativeHumidity,
       windChill
+    );
+  }
+  catch (e) {
+    console.log('Error: ' + e);
+  }
+  console.log(weatherArray);
+  
+  return weatherArray;
+
+}
+
+/**
+ * function to retrieve latest weather measurements from openweathermap
+ * 
+ * note that this provides different outputs than the original function
+ */
+function retrieveWeather_v2(zip) {
+  const weatherArray = [];
+
+  try {
+    const weatherUrl = 'api.openweathermap.org/data/2.5/weather?zip='+zip+',us&units=imperial&appid='+OPEN_WEATHER_ID;
+    const response = UrlFetchApp.fetch(weatherUrl);
+    const weatherData = JSON.parse(response.getContentText());
+
+    // parse the data
+    console.log(weatherData);
+
+
+    const textDescription = weatherData['weather'][0]['main'];
+    const tempF = weatherData['main']['temp'];
+    const windDirection = weatherData['wind']['deg'];
+    const windSpeed = weatherData['wind']['speed'];
+    const barometricPressure = weatherData['main']['pressure'];
+    const humidity = weatherData['main']['humidity'];
+    const clouds = weatherData['clouds']['all'];
+    // add to array
+    weatherArray.push(
+      textDescription,
+      tempF,
+      windDirection,
+      windSpeed,
+      barometricPressure,
+      humidity,
+      clouds
     );
   }
   catch (e) {
