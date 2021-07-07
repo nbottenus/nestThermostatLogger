@@ -31,3 +31,11 @@ Tutorial: [Control Your Nest Thermostat And Build A Temperature Logger In Google
 I followed the above tutorial with the clarification:
 
 * At step 15, run the function showSidebar() from oauth2.gs, and find the sidebar back in the google sheet. This provides the necessary authentication link to make the rest of the API calls work.
+
+# Additional services
+
+I have switched the weather service to [OpenWeatherMap](https://openweathermap.org/) due to the weather.gov data returning blank temperatures frequently. It is free to create an account and obtain an API key for current weather.
+
+I am using an additional indoor temperature sensor, created with a [Particle Photon](https://docs.particle.io/photon/) wifi-equipped microcontroller and DS18B20 temperature sensor. The temperature variable and update function are exposed to the cloud and accessible by a personal [access token](https://docs.particle.io/reference/device-cloud/api/) (created on the command line interface)
+
+I am using [IFTTT](https://ifttt.com/home), with the app installed on an Android phone, to enable push notifications based on relative temperature inside and outside.

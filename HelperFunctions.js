@@ -1,5 +1,5 @@
 /**
- * function to convert celcius to farenheit
+ * Convert celcius to farenheit
  */
 function convertCtoF (t) {
   if(t==null) {
